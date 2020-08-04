@@ -1,5 +1,6 @@
 const getBody = require("../getBody");
 const model = require("../database/db");
+const crypto = require("crypto");
 
 function get(request, response) {
   response.writeHead(200, { "content-type": "text/html" });
@@ -21,8 +22,12 @@ function post(request, response) {
       const user = new URLSearchParams(body);
       const email = user.get("email");
       const password = user.get("password");
+      const hashedPassword = crypto
+        .createHash("sha256")
+        .update(password)
+        .digest("hex");
       model
-        .createUser({ email, password })
+        .createUser({ email, password: hashedPassword })
         .then(() => {
           response.writeHead(200, { "content-type": "text/html" });
           response.end(`
