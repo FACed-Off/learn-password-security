@@ -1,6 +1,7 @@
 const getBody = require("../getBody");
 const model = require("../database/db");
-const crypto = require("crypto")
+const crypto = require("crypto");
+const bcrypt = require("bcryptjs");
 
 function get(request, response) {
   response.writeHead(200, { "content-type": "text/html" });
@@ -22,19 +23,12 @@ function post(request, response) {
       const user = new URLSearchParams(body);
       const email = user.get("email");
       const password = user.get("password");
-      let hashedPassword = crypto
-        .createHash("sha256")
-        .update(password)
-        .digest("hex")
       model
         .getUser(email)
         .then(dbUser => {
           console.log("The stored password is: " + dbUser.password);
-          const hashArray = dbUser.password.split(".");
-          const salt = hashArray[0];
-          const hash = hashArray[1];
-          hashedPassword = salt + "." + hash;
-          console.log("The submitted password is: " + hashedPassword)
+          console.log("The submitted password is: " + password)
+          console.log(bcrypt.compare(password, dbUser.password))
           if (dbUser.password !== hashedPassword) {
             throw new Error("Password mismatch");
           } else {
