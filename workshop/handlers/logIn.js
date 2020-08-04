@@ -22,13 +22,19 @@ function post(request, response) {
       const user = new URLSearchParams(body);
       const email = user.get("email");
       const password = user.get("password");
-      const hashedPassword = crypto
+      let hashedPassword = crypto
         .createHash("sha256")
         .update(password)
         .digest("hex")
       model
         .getUser(email)
         .then(dbUser => {
+          console.log("The stored password is: " + dbUser.password);
+          const hashArray = dbUser.password.split(".");
+          const salt = hashArray[0];
+          const hash = hashArray[1];
+          hashedPassword = salt + "." + hash;
+          console.log("The submitted password is: " + hashedPassword)
           if (dbUser.password !== hashedPassword) {
             throw new Error("Password mismatch");
           } else {

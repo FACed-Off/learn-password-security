@@ -17,6 +17,7 @@ function get(request, response) {
 }
 
 function post(request, response) {
+  const SALT = crypto.randomBytes(12).toString("hex");
   getBody(request)
     .then(body => {
       const user = new URLSearchParams(body);
@@ -24,10 +25,10 @@ function post(request, response) {
       const password = user.get("password");
       const hashedPassword = crypto
         .createHash("sha256")
-        .update(password)
+        .update(SALT + password)
         .digest("hex");
       model
-        .createUser({ email, password: hashedPassword })
+        .createUser({ email, password: SALT + "." + hashedPassword })
         .then(() => {
           response.writeHead(200, { "content-type": "text/html" });
           response.end(`

@@ -36,7 +36,6 @@ function getUser(email) {
       } else {
         const data = JSON.parse(contents);
         const user = data.users.find(user => user.email === email);
-        console.log(data, user)
         if (!user) {
           reject(new Error(`${email} not found in users`));
         } else {
