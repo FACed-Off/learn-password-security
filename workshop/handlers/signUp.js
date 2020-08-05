@@ -19,22 +19,21 @@ function get(request, response) {
 
 function post(request, response) {
   getBody(request)
-    .then(body => {
+    .then((body) => {
       const user = new URLSearchParams(body);
       const email = user.get("email");
       const password = user.get("password");
       bcrypt
         .genSalt(10)
-        .then((salt) => {bcrypt.hash(password, salt)})
-        .then((hash) => {
-        model.createUser({ email, password: hash })
+        .then((salt) => bcrypt.hash(password, salt))
+        .then((hash) => model.createUser({ email, password: hash }))
         .then(() => {
           response.writeHead(200, { "content-type": "text/html" });
           response.end(`
           <h1>Thanks for signing up, ${email}</h1>
           `);
         })
-        .catch(error => {
+        .catch((error) => {
           console.error(error);
           response.writeHead(500, { "content-type": "text/html" });
           response.end(`
@@ -42,14 +41,14 @@ function post(request, response) {
             <p>${error}</p> 
           `);
         });
-      })
-      .catch(error => {
-        console.error(error);
-        response.writeHead(500, { "content-type": "text/html" });
-        response.end(`
+    })
+    .catch((error) => {
+      console.error(error);
+      response.writeHead(500, { "content-type": "text/html" });
+      response.end(`
           <h1>Something went wrong, sorry</h1>
         `);
-      });
-  })
+    });
+}
 
 module.exports = { get, post };
